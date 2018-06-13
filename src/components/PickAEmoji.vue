@@ -56,15 +56,62 @@
                     </span>
                 </div>
             </div>
+            <div class="emoji-preview">
+                <div class="default-preview">
+                    <div>
+                        Emoji Deluxe
+                    </div>
+
+                </div>
+
+                <div class="skin-ton-picker">
+                    <div class="hands">
+                        <span v-for="(item,index) in getToneHands()"
+                              :key="index"
+                              v-if="item.name === getDefaultSkinTon().name || showSkinTonPickers"
+                              @click="setDefaultSkinTon(item)"
+                              class="hand">
+                            {{ item.emoji}}
+                        </span>
+                    </div>
+                    <div class="tip"
+                         v-if="showSkinTonPickers">
+                        Choose you defualt skin ton
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+import skinTone from 'skin-tone';
 import Popper from 'popper.js';
 import {categories, searchSVG, emojiInvokerFaceSVG} from '../data/svg.js';
 import emojis from '../data/emojis';
 import frequentlyUsed from '../data/frequently-used';
+
+const skinToneNames = [
+  {
+    name: 'NONE'
+  },
+  {
+    name: 'WHITE'
+  },
+  {
+    name: 'CREAM_WHITE'
+  },
+  {
+    name: 'LIGHT_BROWN'
+  },
+  {
+    name: 'BROWN'
+  },
+  {
+    name: 'DARK_BROWN'
+  }
+];
 
 export default {
   data () {
@@ -79,7 +126,10 @@ export default {
       initEmojis: {},
       emojiInvokerFaceSVG: emojiInvokerFaceSVG,
       categories: categories,
-      scrolledTo: 'frequently_used'
+      scrolledTo: 'frequently_used',
+      defaultSkinTon: null,
+      skinTonPickers: [],
+      showSkinTonPickers: false
     };
   },
   watch: {
@@ -119,17 +169,11 @@ export default {
       let frequentUsedEmojis = localStorage.getItem('frequently_used_emojis');
 
       if (frequentUsedEmojis === null) {
-
         frequentUsedEmojis = frequentlyUsed;
-        console.log(frequentUsedEmojis);
       }
 
       if (!Array.isArray(frequentUsedEmojis)) {
         frequentUsedEmojis = JSON.parse(frequentUsedEmojis);
-
-        console.log(frequentUsedEmojis.length);
-
-        console.log(frequentUsedEmojis);
       }
       return frequentUsedEmojis;
     },
@@ -157,23 +201,16 @@ export default {
     },
     filteredEmojis () {
       let filteredEmojis = {};
-      Object.keys(this.initEmojis).forEach(category => {
-        filteredEmojis = {...filteredEmojis, ...{[category]: []}};
-      });
-
       for (let category in this.initEmojis) {
         this.initEmojis[category].forEach(emoji => {
           if (~emoji.description.toLowerCase().indexOf(this.search.toLowerCase())) {
+            if (!filteredEmojis.hasOwnProperty(category)) {
+              filteredEmojis[category] = [];
+            }
             filteredEmojis[category] = [ ...filteredEmojis[category], emoji ];
           }
         });
       }
-
-      Object.keys(this.initEmojis).forEach(category => {
-        if (filteredEmojis[category].length === 0) {
-          delete filteredEmojis[category];
-        }
-      });
 
       return filteredEmojis;
     },
@@ -193,21 +230,48 @@ export default {
     categorizeEmojis () {
       let categorizedEmojis = {};
       let allEmojis = [...this.getFrequentUsedEmojis(), ...emojis];
-      let categories = allEmojis.map(item => item.category);
+      let {name: tone} = this.getDefaultSkinTon();
 
-      categories = [...new Set(categories)];
-      categories.forEach(category => {
-        categorizedEmojis = {...categorizedEmojis, ...{[category]: []}};
-      });
-
-      allEmojis.forEach(emoji => {
-        categorizedEmojis[emoji.category] = [...categorizedEmojis[emoji.category], emoji];
+      allEmojis.forEach(emojiObj => {
+        if (!categorizedEmojis.hasOwnProperty(emojiObj.category)) {
+          categorizedEmojis[emojiObj.category] = [];
+        }
+        emojiObj.emoji = skinTone(emojiObj.emoji, skinTone[tone]);
+        categorizedEmojis[emojiObj.category] = [...categorizedEmojis[emojiObj.category], emojiObj];
       });
 
       return categorizedEmojis;
+    },
+    getDefaultSkinTon () {
+      let defaultSkinTon = localStorage.getItem('default_skin_ton');
+      return defaultSkinTon === null
+        ? {name: 'NONE', emoji: '✋'}
+        : JSON.parse(defaultSkinTon);
+    },
+    setDefaultSkinTon (skinTon) {
+      this.showSkinTonPickers = !this.showSkinTonPickers;
+      localStorage.setItem('default_skin_ton', JSON.stringify(skinTon));
+      this.resetInitEmojis(skinTon.name);
+    },
+    resetInitEmojis (tone) {
+      for (let categroy in this.initEmojis) {
+        this.initEmojis[categroy].forEach(emojiObj => {
+          emojiObj.emoji = skinTone(emojiObj.emoji, skinTone[tone]);
+        });
+      }
+    },
+    getToneHands () {
+      return skinToneNames.map(item => {
+        return { ...item, ...{ emoji: skinTone('✋', skinTone[item.name]) } };
+      }).sort(this.sortToneHands);
+    },
+
+    sortToneHands (a, b) {
+      return a.name === this.getDefaultSkinTon().name ? 1 : 0;
     }
   },
   mounted () {
+    this.skinTonPickers = this.getToneHands();
     this.initEmojis = this.categorizeEmojis();
     this.emojiDropdown = this.$refs.emojiDropdown;
     this.emojiInvoker = this.$refs.emojiInvoker;
@@ -239,7 +303,7 @@ export default {
     width: 245px;
     border: 1px solid #dae1e7;
     border-radius: 5px;
-    padding: 0 10px 5px 12px;
+    padding: 0 10px 0px 10px;
     background: white;
     .header {
       border-bottom: 1px solid #dddd;
@@ -250,6 +314,8 @@ export default {
       display: flex;
       background: #f8fafc;
       justify-content: space-between;
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
     }
     .search {
       position: relative;
@@ -273,7 +339,7 @@ export default {
       }
     }
     .emojis {
-      height: 200px;
+      height: 180px;
       display: flex;
       flex-direction: column;
       overflow-y: scroll;
@@ -281,7 +347,7 @@ export default {
       position: relative;
       .category {
         text-transform: capitalize;
-        padding: 8px 0px;
+        padding: 6px 0px;
         color: #3d4852;
       }
       &::-webkit-scrollbar {
@@ -316,6 +382,39 @@ export default {
   svg {
     fill: currentColor;
     max-height: 18px;
+  }
+  .emoji-preview {
+    margin-left: -10px;
+    margin-right: -10px;
+    height: 3rem;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+  }
+
+  .emoji-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .skin-ton-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .hands {
+      font-size: 1.3rem;
+      display: flex;
+      .hand {
+        cursor: pointer;
+      }
+    }
+    .tip {
+      font-size: 0.8rem;
+      color: grey;
+    }
   }
 }
 </style>

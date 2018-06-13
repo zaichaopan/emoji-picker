@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "popper.js": "^1.14.3",
+    "skin-tone": "^1.0.0",
     "vue": "^2.5.16"
   },
   "devDependencies": {
