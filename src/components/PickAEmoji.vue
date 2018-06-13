@@ -1,118 +1,127 @@
 <template>
-    <div class="emoji-picker">
-        <div class="emoji-invoker"
-             ref="emojiInvoker">
-            <span class="invoker-icon"
-                  ref="emojiInvokerIcon">
-                <span v-if="show"
-                      class="show"
-                      v-html="emojiInvokerFaceSVG">
-                </span>
-                <span v-else>&#9786;</span>
-            </span>
-        </div>
-        <div v-show="show"
-             class="emoji-dropdown"
-             ref="emojiDropdown">
-            <div class="header">
-                <span v-for="(val,key) in categories"
-                      :key="key"
-                      :title="val"
-                      :class="{active: key === scrolledTo}"
-                      class="pointer"
-                      @click="scrollToCategory(key)"
-                      v-html="val">
+    <click-outside :do="close">
+        <div class="emoji-picker">
+            <div class="emoji-invoker"
+                 ref="emojiInvoker">
+                <span class="invoker-icon pointer"
+                      ref="emojiInvokerIcon"
+                      @click="toggleDropdown">
+                    <span v-if="isInvokerHovered || show"
+                          @mouseleave="isInvokerHovered = false"
+                          v-html="emojiInvokerOpen">
+                    </span>
+
+                    <span v-else
+                          class="show"
+                          @mouseenter="isInvokerHovered = true"
+                          v-html="emojiInvokerClose">;
+                    </span>
                 </span>
             </div>
-
-            <div class="search">
-                <span class="search-icon"
-                      v-html="searchSVG">
-                </span>
-                <input type="text"
-                       v-model="search"
-                       placeholder="Search" />
-            </div>
-
-            <div v-if="Object.keys(emojis).length===0"
-                 class="emojis"
-                 ref="emojis">
-                <span class="result-info">No emojis found.</span>
-            </div>
-            <div v-else
-                 class="emojis"
-                 ref="emojis">
-                <div v-for="(items, category) in emojis"
-                     :key="category">
-                    <div class="category"
-                         :ref="getCategoryRef(category)">{{category}}
-                    </div>
-
-                    <div class="emoji-list">
-                        <span v-for="(item, index) in items"
-                              class="emoji pointer"
-                              :key="index"
-                              :title="item.aliases"
-                              @click="selectEmoji(item)"
-                              @mouseleave="handleMouseLeaveEmoji"
-                              @mouseenter="handleMouseEnterEmoji(item)">
-                            {{ item.emoji }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-            <div class="footer"
-                 @mouseleave="handleMouseLeaveFooter">
-                <div class="title"
-                     v-if="hoveredEmoji === null">
-                    Emoji Deluxe
+            <div v-show="show"
+                 class="emoji-dropdown"
+                 ref="emojiDropdown">
+                <div class="header">
+                    <span v-for="(val,key) in categories"
+                          :key="key"
+                          :title="val"
+                          :class="{active: key === scrolledTo}"
+                          class="pointer"
+                          @click="scrollToCategory(key)"
+                          v-html="val">
+                    </span>
                 </div>
 
+                <div class="search">
+                    <span class="search-icon"
+                          v-html="searchSVG">
+                    </span>
+                    <input type="text"
+                           v-model="search"
+                           placeholder="Search" />
+                </div>
+
+                <div v-if="Object.keys(emojis).length===0"
+                     class="emojis"
+                     ref="emojis">
+                    <span class="result-info">No emojis found.</span>
+                </div>
                 <div v-else
-                     class="emoji-preview">
-                    <div class="emoji">
-                        {{ hoveredEmoji.emoji}}
-                    </div>
-
-                    <div class="alias-container">
-                        <div class="title">
-                            &nbsp;{{hoveredEmoji.aliases[0]}} &nbsp;
-                        </div>
-                        <div class="alias">
-                            {{ `:${hoveredEmoji.aliases[0]}:`}}
+                     class="emojis"
+                     ref="emojis">
+                    <div v-for="(items, category) in emojis"
+                         :key="category">
+                        <div class="category"
+                             :ref="getCategoryRef(category)">{{category}}
                         </div>
 
-                    </div>
-                </div>
-
-                <div class="ton-picker">
-                    <div class="hands-container">
-                        <div class="hands">
-                            <span v-for="(item,index) in getToneHands()"
+                        <div class="emoji-list">
+                            <span v-for="(item, index) in items"
+                                  class="emoji pointer"
                                   :key="index"
-                                  v-if="item.name === getDefaultSkinTon().name || showSkinTonPickers"
-                                  @click="setDefaultSkinTon(item)"
-                                  class="hand">
-                                {{ item.emoji}}
+                                  :title="item.aliases"
+                                  @click="selectEmoji(item)"
+                                  @mouseleave="handleMouseLeaveEmoji"
+                                  @mouseenter="handleMouseEnterEmoji(item)">
+                                {{ item.emoji }}
                             </span>
                         </div>
-                        <div class="tip"
-                             v-if="showSkinTonPickers">
-                            Choose you defualt skin ton
+                    </div>
+                </div>
+                <div class="footer"
+                     @mouseleave="handleMouseLeaveFooter">
+                    <div class="title"
+                         v-if="hoveredEmoji === null">
+                        Emoji Deluxe
+                    </div>
+
+                    <div v-else
+                         class="emoji-preview">
+                        <div class="emoji">
+                            {{ hoveredEmoji.emoji}}
+                        </div>
+
+                        <div class="alias-container">
+                            <div class="title">
+                                &nbsp;{{hoveredEmoji.aliases[0]}} &nbsp;
+                            </div>
+                            <div class="alias">
+                                {{ `:${hoveredEmoji.aliases[0]}:`}}
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="ton-picker">
+                        <div class="hands-container">
+                            <div class="hands">
+                                <span v-for="(item,index) in getToneHands()"
+                                      :key="index"
+                                      v-if="item.name === getDefaultSkinTon().name || showSkinTonPickers"
+                                      @click="setDefaultSkinTon(item)"
+                                      class="hand">
+                                    {{ item.emoji}}
+                                </span>
+                            </div>
+                            <div class="tip"
+                                 v-if="showSkinTonPickers">
+                                Choose you defualt skin ton
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </click-outside>
 </template>
 
 <script>
 import skinTone from 'skin-tone';
 import Popper from 'popper.js';
-import {categories, searchSVG, emojiInvokerFaceSVG} from '../data/svg.js';
+import {categories, searchSVG, emojiInvokerOpen, emojiInvokerClose} from '../data/svg.js';
 import emojis from '../data/emojis';
 import frequentlyUsed from '../data/frequently-used';
+import ClickOutside from './ClickOutside.vue';
 
 const skinToneNames = [
   {
@@ -136,9 +145,13 @@ const skinToneNames = [
 ];
 
 export default {
+  components: {
+    ClickOutside
+  },
   data () {
     return {
       show: false,
+      isInvokerHovered: false,
       search: '',
       emojiInvokerIcon: null,
       emojiInvoker: null,
@@ -146,12 +159,14 @@ export default {
       selectedEmoji: null,
       searchSVG: searchSVG,
       initEmojis: {},
-      emojiInvokerFaceSVG: emojiInvokerFaceSVG,
+      emojiInvokerClose: emojiInvokerClose,
+      emojiInvokerOpen: emojiInvokerOpen,
       categories: categories,
       scrolledTo: 'frequently_used',
       skinTonPickers: [],
       showSkinTonPickers: false,
-      hoveredEmoji: null
+      hoveredEmoji: null,
+      popper: null
     };
   },
   watch: {
@@ -164,6 +179,10 @@ export default {
       if (!this.show) {
         this.search = '';
       }
+
+      this.$nextTick(() => {
+        this.setupPopper();
+      });
     }
   },
   computed: {
@@ -172,6 +191,20 @@ export default {
     }
   },
   methods: {
+    open () {
+      this.show = true;
+    },
+    close () {
+      this.show = false;
+    },
+
+    toggleDropdown () {
+      if (this.show) {
+        this.close();
+      } else {
+        this.open();
+      }
+    },
     setFrequentUsedEmoji (emojiObj) {
       let key = 'Frequently Used';
       const maxLength = 9;
@@ -236,16 +269,6 @@ export default {
 
       return filteredEmojis;
     },
-    handleClick () {
-      window.addEventListener('click', e => {
-        if (this.emojiInvokerIcon.contains(e.target)) {
-          return (this.show = !this.show);
-        }
-        if (!this.emojiDropdown.contains(e.target)) {
-          this.show = false;
-        }
-      });
-    },
     getCategoryRef (category) {
       return category.toLowerCase().split(' ').join('_');
     },
@@ -307,6 +330,15 @@ export default {
     },
     handleMouseLeaveEmoji (emoji) {
       this.hoveredEmoji = null;
+    },
+    setupPopper () {
+      if (this.popper === null) {
+        this.popper = new Popper(this.emojiInvoker, this.emojiDropdown, {
+          placement: 'bottom-end'
+        });
+      } else {
+        this.popper.scheduleUpdate();
+      }
     }
   },
   mounted () {
@@ -315,10 +347,6 @@ export default {
     this.emojiDropdown = this.$refs.emojiDropdown;
     this.emojiInvoker = this.$refs.emojiInvoker;
     this.emojiInvokerIcon = this.$refs.emojiInvokerIcon;
-    const popper = new Popper(this.emojiInvoker, this.emojiDropdown, {
-      placement: 'bottom-start'
-    });
-    this.handleClick();
     this.handleScroll();
   }
 };
@@ -327,7 +355,6 @@ export default {
 <style lang="scss" scoped>
 .emoji-picker {
   position: relative;
-  width: 265px;
   .emoji-invoker {
     position: relative;
     text-align: right;
@@ -339,7 +366,8 @@ export default {
     }
   }
   .emoji-dropdown {
-    width: 265px;
+    width: 295px;
+    margin: 10px 0px;
     border: 1px solid #dae1e7;
     border-radius: 5px;
     padding: 0 4px 0px 4px;
@@ -390,7 +418,7 @@ export default {
       position: relative;
       .category {
         text-transform: capitalize;
-        padding: 6px 0px;
+        padding: 6px;
         color: #3d4852;
         position: sticky;
         z-index: 2;
@@ -412,7 +440,7 @@ export default {
         justify-content: space-between;
       }
       .emoji {
-        padding: 2px;
+        padding: 3px;
         font-size: 1.5em;
       }
     }

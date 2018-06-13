@@ -1,12 +1,13 @@
 <template>
     <div class="message">
-        <textarea name="message"
-                  id="message"
-                  cols="30"
-                  rows="10"
-                  v-model="message"
-                  @click="e => selectionEnd = e.target.selectionEnd"
-                  @input="e => selectionEnd= e.target.value.length"></textarea>
+        <div contenteditable="true"
+             class="rich-editor-container"
+             ref="textarea"
+             @keypress.enter.prevent
+             @input="updateBody($event.target.innerHTML)"
+             @click="handleEditorClick"
+             placeholder="Type a message...">
+        </div>
         <div class="message-emoji">
             <pick-a-emoji @emoji:picked="handleEmojiPicked" />
         </div>
@@ -24,39 +25,70 @@ export default {
   data () {
     return {
       selectionEnd: 0,
-      message: ''
+      message: '',
+      body: ''
     };
   },
   methods: {
+    updateBody (text) {
+      this.body = text;
+    },
     handleEmojiPicked (emoji) {
-      if (this.selectionEnd === 0) {
-        return (this.message += emoji);
-      }
-      let start = this.message.substring(0, this.selectionEnd);
-      let end = this.message.substring(this.selectionEnd);
-      this.message = `${start}${emoji}${end}`;
-      this.selectionEnd = 0;
+      console.log(emoji);
+      this.$refs.textarea.innerHTML = `${this.$refs.textarea.innerHTML} ${emoji}`;
+      this.updateBody(this.$refs.textarea.innerHTML);
+    },
+    handleEditorClick () {
+      this.focusEditor();
+    },
+    focusEditor () {
+      this.$refs.textarea.focus();
     }
+  },
+  mounted () {
+    this.focusEditor();
   }
 };
 </script>
 
 <style lang="scss">
-#app {
-  .message {
-    position: relative;
+html,
+body {
+  height: 100%;
+}
+body {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
 
-    textarea {
-      width: 100%;
-      font-size: 18px;
-      border: 1px solid;
-    }
+.message {
+  margin-top: 150px;
+  position: relative;
+  display: flex;
+  width: 80%;
+  .rich-editor-container {
+    width: 100%;
+    height: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 9999px;
+    padding: 5px 40px 5px 15px;
+    line-height: 2rem;
 
-    .message-emoji {
-      position: absolute;
-      bottom: 0px;
-      right: 0px;
+    &:focus {
+      outline: none;
     }
+  }
+
+  .message-emoji {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+
+  [contenteditable="true"]:empty:before {
+    content: attr(placeholder);
+    color: grey;
   }
 }
 </style>
