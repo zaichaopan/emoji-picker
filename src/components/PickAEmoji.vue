@@ -51,7 +51,7 @@
                           class="emoji pointer"
                           :key="index"
                           :title="item.aliases"
-                          @click="selectEmoji(item.emoji)">
+                          @click="selectEmoji(item)">
                         {{ item.emoji }}
                     </span>
                 </div>
@@ -100,8 +100,42 @@ export default {
     }
   },
   methods: {
-    selectEmoji (emoji) {
-      this.$emit('emoji:picked', emoji);
+    setFrequentUsedEmoji (emojiObj) {
+      let key = 'Frequently Used';
+      const maxLength = 9;
+      let frequentUsedEmojis = this.getFrequentUsedEmojis().filter(item => item.description !== emojiObj.description);
+      emojiObj.category = key;
+      frequentUsedEmojis = [...frequentUsedEmojis, emojiObj];
+
+      if (frequentUsedEmojis.length > maxLength) {
+        frequentUsedEmojis.shift();
+      }
+
+      localStorage.setItem('frequently_used_emojis', JSON.stringify(frequentUsedEmojis));
+
+      this.initEmojis[key] = frequentUsedEmojis;
+    },
+    getFrequentUsedEmojis () {
+      let frequentUsedEmojis = localStorage.getItem('frequently_used_emojis');
+
+      if (frequentUsedEmojis === null) {
+
+        frequentUsedEmojis = frequentlyUsed;
+        console.log(frequentUsedEmojis);
+      }
+
+      if (!Array.isArray(frequentUsedEmojis)) {
+        frequentUsedEmojis = JSON.parse(frequentUsedEmojis);
+
+        console.log(frequentUsedEmojis.length);
+
+        console.log(frequentUsedEmojis);
+      }
+      return frequentUsedEmojis;
+    },
+    selectEmoji (emojiObj) {
+      this.$emit('emoji:picked', emojiObj.emoji);
+      this.setFrequentUsedEmoji(emojiObj);
       this.show = false;
     },
     scrollToCategory (category) {
@@ -158,8 +192,9 @@ export default {
     },
     categorizeEmojis () {
       let categorizedEmojis = {};
-      let allEmojis = [...frequentlyUsed, ...emojis];
+      let allEmojis = [...this.getFrequentUsedEmojis(), ...emojis];
       let categories = allEmojis.map(item => item.category);
+
       categories = [...new Set(categories)];
       categories.forEach(category => {
         categorizedEmojis = {...categorizedEmojis, ...{[category]: []}};

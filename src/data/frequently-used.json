@@ -57,7 +57,7 @@
     {
         "emoji": "☹️",
         "description": "frowning face",
-        "category": "People",
+        "category": "Frequently Used",
         "aliases": [
             "Frequently Used"
         ],
@@ -93,8 +93,8 @@
     },
     {
         "emoji": "🍅",
-        "description": "Frequently Used",
-        "category": "Foods",
+        "description": "tomato",
+        "category": "Frequently Used",
         "aliases": [
             "tomato"
         ],
