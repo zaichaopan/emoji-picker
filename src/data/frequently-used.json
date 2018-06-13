@@ -1,0 +1,116 @@
+[
+    {
+        "emoji": "👍",
+        "description": "thumbs up",
+        "category": "Frequently Used",
+        "aliases": [
+            "+1",
+            "thumbsup"
+        ],
+        "tags": [
+            "approve",
+            "ok"
+        ],
+        "unicode_version": "6.0",
+        "ios_version": "6.0"
+    },
+    {
+        "emoji": "👌",
+        "description": "OK hand",
+        "category": "Frequently Used",
+        "aliases": [
+            "ok_hand"
+        ],
+        "tags": [],
+        "unicode_version": "6.0",
+        "ios_version": "6.0"
+    },
+    {
+        "emoji": "🍻",
+        "description": "clinking beer mugs",
+        "category": "Frequently Used",
+        "aliases": [
+            "beers"
+        ],
+        "tags": [
+            "drinks"
+        ],
+        "unicode_version": "6.0",
+        "ios_version": "6.0"
+    },
+    {
+        "emoji": "😄",
+        "description": "smiling face with open mouth & smiling eyes",
+        "category": "Frequently Used",
+        "aliases": [
+            "smile"
+        ],
+        "tags": [
+            "happy",
+            "joy",
+            "laugh",
+            "pleased"
+        ],
+        "unicode_version": "6.0",
+        "ios_version": "6.0"
+    },
+    {
+        "emoji": "☹️",
+        "description": "frowning face",
+        "category": "People",
+        "aliases": [
+            "Frequently Used"
+        ],
+        "tags": [],
+        "unicode_version": "",
+        "ios_version": "9.1"
+    },
+    {
+        "emoji": "🍾",
+        "description": "bottle with popping cork",
+        "category": "Frequently Used",
+        "aliases": [
+            "champagne"
+        ],
+        "tags": [
+            "bottle",
+            "bubbly",
+            "celebration"
+        ],
+        "unicode_version": "8.0",
+        "ios_version": "9.1"
+    },
+    {
+        "emoji": "🤔",
+        "description": "thinking face",
+        "category": "Frequently Used",
+        "aliases": [
+            "thinking"
+        ],
+        "tags": [],
+        "unicode_version": "8.0",
+        "ios_version": "9.1"
+    },
+    {
+        "emoji": "🍅",
+        "description": "Frequently Used",
+        "category": "Foods",
+        "aliases": [
+            "tomato"
+        ],
+        "tags": [],
+        "unicode_version": "6.0",
+        "ios_version": "6.0"
+    },
+    {
+        "emoji": "🍷",
+        "description": "wine glass",
+        "category": "Frequently Used",
+        "aliases": [
+            "wine_glass"
+        ],
+        "tags": [],
+        "unicode_version": "6.0",
+        "ios_version": "6.0"
+    }
+]
