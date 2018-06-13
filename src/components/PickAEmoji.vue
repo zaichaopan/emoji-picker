@@ -47,39 +47,61 @@
                     <div class="category"
                          :ref="getCategoryRef(category)">{{category}}
                     </div>
-                    <span v-for="(item, index) in items"
-                          class="emoji pointer"
-                          :key="index"
-                          :title="item.aliases"
-                          @click="selectEmoji(item)">
-                        {{ item.emoji }}
-                    </span>
-                </div>
-            </div>
-            <div class="emoji-preview">
-                <div class="default-preview">
-                    <div>
-                        Emoji Deluxe
-                    </div>
 
-                </div>
-
-                <div class="skin-ton-picker">
-                    <div class="hands">
-                        <span v-for="(item,index) in getToneHands()"
+                    <div class="emoji-list">
+                        <span v-for="(item, index) in items"
+                              class="emoji pointer"
                               :key="index"
-                              v-if="item.name === getDefaultSkinTon().name || showSkinTonPickers"
-                              @click="setDefaultSkinTon(item)"
-                              class="hand">
-                            {{ item.emoji}}
+                              :title="item.aliases"
+                              @click="selectEmoji(item)"
+                              @mouseleave="handleMouseLeaveEmoji"
+                              @mouseenter="handleMouseEnterEmoji(item)">
+                            {{ item.emoji }}
                         </span>
                     </div>
-                    <div class="tip"
-                         v-if="showSkinTonPickers">
-                        Choose you defualt skin ton
+                </div>
+            </div>
+            <div class="footer"
+                 @mouseleave="handleMouseLeaveFooter">
+                <div class="title"
+                     v-if="hoveredEmoji === null">
+                    Emoji Deluxe
+                </div>
+
+                <div v-else
+                     class="emoji-preview">
+                    <div class="emoji">
+                        {{ hoveredEmoji.emoji}}
+                    </div>
+
+                    <div class="alias-container">
+                        <div class="title">
+                            &nbsp;{{hoveredEmoji.aliases[0]}} &nbsp;
+                        </div>
+                        <div class="alias">
+                            {{ `:${hoveredEmoji.aliases[0]}:`}}
+                        </div>
+
                     </div>
                 </div>
 
+                <div class="ton-picker">
+                    <div class="hands-container">
+                        <div class="hands">
+                            <span v-for="(item,index) in getToneHands()"
+                                  :key="index"
+                                  v-if="item.name === getDefaultSkinTon().name || showSkinTonPickers"
+                                  @click="setDefaultSkinTon(item)"
+                                  class="hand">
+                                {{ item.emoji}}
+                            </span>
+                        </div>
+                        <div class="tip"
+                             v-if="showSkinTonPickers">
+                            Choose you defualt skin ton
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -127,9 +149,9 @@ export default {
       emojiInvokerFaceSVG: emojiInvokerFaceSVG,
       categories: categories,
       scrolledTo: 'frequently_used',
-      defaultSkinTon: null,
       skinTonPickers: [],
-      showSkinTonPickers: false
+      showSkinTonPickers: false,
+      hoveredEmoji: null
     };
   },
   watch: {
@@ -265,9 +287,26 @@ export default {
         return { ...item, ...{ emoji: skinTone('✋', skinTone[item.name]) } };
       }).sort(this.sortToneHands);
     },
-
     sortToneHands (a, b) {
       return a.name === this.getDefaultSkinTon().name ? 1 : 0;
+    },
+    handleMouseLeaveFooter () {
+      if (this.showSkinTonPickers) {
+        this.showSkinTonPickers = false;
+      }
+
+      if (this.hoveredEmoji !== null) {
+        this.hoveredEmoji = null;
+      }
+    },
+    handleMouseEnterEmoji (emoji) {
+      if (this.showSkinTonPickers) {
+        this.showSkinTonPickers = false;
+      }
+      this.hoveredEmoji = emoji;
+    },
+    handleMouseLeaveEmoji (emoji) {
+      this.hoveredEmoji = null;
     }
   },
   mounted () {
@@ -300,17 +339,19 @@ export default {
     }
   }
   .emoji-dropdown {
-    width: 245px;
+    width: 265px;
     border: 1px solid #dae1e7;
     border-radius: 5px;
-    padding: 0 10px 0px 10px;
+    padding: 0 4px 0px 4px;
     background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     .header {
       border-bottom: 1px solid #dddd;
-      margin-left: -10px;
-      margin-right: -10px;
+      width: 100%;
       margin-bottom: 10px;
-      padding: 10px 10px 0 10px;
+      padding: 10px 4px 0 4px;
       display: flex;
       background: #f8fafc;
       justify-content: space-between;
@@ -319,6 +360,7 @@ export default {
     }
     .search {
       position: relative;
+      width: 100%;
       input {
         width: 100%;
         box-sizing: border-box;
@@ -339,11 +381,12 @@ export default {
       }
     }
     .emojis {
-      height: 180px;
       display: flex;
       flex-direction: column;
+      height: 180px;
+      width: 100%;
       overflow-y: scroll;
-      margin-right: -7px;
+      overflow-x: hidden;
       position: relative;
       .category {
         text-transform: capitalize;
@@ -358,6 +401,11 @@ export default {
       &::-webkit-scrollbar-thumb {
         background-color: rgba(201, 199, 199, 0.867);
         border-radius: 5px;
+      }
+      .emoji-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
       }
       .emoji {
         padding: 2px;
@@ -383,37 +431,71 @@ export default {
     fill: currentColor;
     max-height: 18px;
   }
-  .emoji-preview {
-    margin-left: -10px;
-    margin-right: -10px;
-    height: 3rem;
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 4px;
+    width: 100%;
+    height: 2.5rem;
     border-top: 1px solid #ddd;
     background: #f9f9f9;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
-  }
 
-  .emoji-preview {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-  }
-
-  .skin-ton-picker {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .hands {
-      font-size: 1.3rem;
+    .emoji-preview {
       display: flex;
-      .hand {
-        cursor: pointer;
+      justify-content: space-between;
+      align-items: center;
+      .emoji {
+        font-size: 2rem;
+        margin-right: 0.5rem;
+      }
+
+      .alias-container {
+        font-size: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .title {
+          color: #3d4852;
+        }
+
+        .alias {
+          color: grey;
+        }
       }
     }
-    .tip {
-      font-size: 0.8rem;
+
+    .title {
+      padding-left: 6px;
       color: grey;
+    }
+
+    .ton-picker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 6px;
+      .hands-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        .hands {
+          font-size: 1.3rem;
+          display: flex;
+          .hand {
+            cursor: pointer;
+          }
+        }
+        .tip {
+          font-size: 0.8rem;
+          color: grey;
+        }
+      }
     }
   }
 }
