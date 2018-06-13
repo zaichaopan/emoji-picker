@@ -392,6 +392,10 @@ export default {
         text-transform: capitalize;
         padding: 6px 0px;
         color: #3d4852;
+        position: sticky;
+        z-index: 2;
+        top: 0;
+        background: white;
       }
       &::-webkit-scrollbar {
         width: 6px;
