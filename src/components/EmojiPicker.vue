@@ -118,35 +118,29 @@
 <script>
 import skinTone from 'skin-tone';
 import Popper from 'popper.js';
-import {categories, searchSVG, emojiInvokerOpen, emojiInvokerClose} from '../data/svg.js';
-import emojis from '../data/emojis';
-import frequentlyUsed from '../data/frequently-used';
+import {categories, searchSVG, emojiInvokerOpen, emojiInvokerClose} from '../../data/svg.js';
+import frequentlyUsed from '../../data/frequently-used';
 import ClickOutside from './ClickOutside.vue';
 
 const skinToneNames = [
-  {
-    name: 'NONE'
-  },
-  {
-    name: 'WHITE'
-  },
-  {
-    name: 'CREAM_WHITE'
-  },
-  {
-    name: 'LIGHT_BROWN'
-  },
-  {
-    name: 'BROWN'
-  },
-  {
-    name: 'DARK_BROWN'
-  }
+  { name: 'NONE' },
+  { name: 'WHITE' },
+  { name: 'CREAM_WHITE' },
+  { name: 'LIGHT_BROWN' },
+  { name: 'BROWN' },
+  { name: 'DARK_BROWN' }
 ];
 
 export default {
+  name: 'EmojiPicker',
   components: {
     ClickOutside
+  },
+  props: {
+    data: {
+      type: Array,
+      required: true
+    }
   },
   data () {
     return {
@@ -274,7 +268,7 @@ export default {
     },
     categorizeEmojis () {
       let categorizedEmojis = {};
-      let allEmojis = [...this.getFrequentUsedEmojis(), ...emojis];
+      let allEmojis = [...this.getFrequentUsedEmojis(), ...this.data];
       let {name: tone} = this.getDefaultSkinTon();
 
       allEmojis.forEach(emojiObj => {
@@ -352,7 +346,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" style="scope">
 .emoji-picker {
   position: relative;
   .emoji-invoker {

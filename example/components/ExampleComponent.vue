@@ -9,23 +9,19 @@
              placeholder="Type a message...">
         </div>
         <div class="message-emoji">
-            <pick-a-emoji @emoji:picked="handleEmojiPicked" />
+            <emoji-picker @emoji:picked="handleEmojiPicked"
+                          :data="emojis" />
         </div>
     </div>
 </template>
 
 <script>
-import PickAEmoji from './components/PickAEmoji.vue';
+import data from '../../data/emojis.json';
 
 export default {
-  name: 'App',
-  components: {
-    PickAEmoji
-  },
   data () {
     return {
-      selectionEnd: 0,
-      message: '',
+      emojis: data,
       body: ''
     };
   },
@@ -34,7 +30,6 @@ export default {
       this.body = text;
     },
     handleEmojiPicked (emoji) {
-      console.log(emoji);
       this.$refs.textarea.innerHTML = `${this.$refs.textarea.innerHTML} ${emoji}`;
       this.updateBody(this.$refs.textarea.innerHTML);
     },
@@ -52,16 +47,7 @@ export default {
 </script>
 
 <style lang="scss">
-html,
-body {
-  height: 100%;
-}
-body {
-  display: flex;
-  justify-content: center;
-  margin: 0;
-}
-
+@import "../../dist/emoji-picker.css";
 .message {
   margin-top: 150px;
   position: relative;
@@ -83,7 +69,7 @@ body {
   .message-emoji {
     position: absolute;
     right: 5px;
-    top: 5px;
+    top: 12px;
   }
 
   [contenteditable="true"]:empty:before {
