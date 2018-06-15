@@ -1,5 +1,5 @@
 <template>
-    <div class="message">
+    <div class="message-two">
         <div contenteditable="true"
              class="rich-editor-container"
              ref="textarea"
@@ -48,8 +48,8 @@ export default {
 
 <style lang="scss">
 @import "../../dist/emoji-picker.css";
-.message {
-  margin-top: 150px;
+.message-two {
+  margin-top: 350px;
   position: relative;
   display: flex;
   width: 80%;
@@ -69,7 +69,7 @@ export default {
   .message-emoji {
     position: absolute;
     right: 5px;
-    top: 12px;
+    top: 18px;
   }
 
   [contenteditable="true"]:empty:before {

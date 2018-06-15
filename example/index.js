@@ -1,10 +1,12 @@
 import Vue from 'vue';
-import EmojiPicker from '../dist/emoji-picker.umd.js';
-import ExampleComponent from './components/ExampleComponent.vue';
+import EmojiPicker from '../dist/emoji-picker.common.js';
+import ExampleOne from './components/ExampleOne.vue';
+import ExampleTwo from './components/ExampleTwo.vue';
 
 Vue.use(EmojiPicker);
 
-Vue.component('ExampleComponent', ExampleComponent);
+Vue.component('ExampleOne', ExampleOne);
+Vue.component('ExampleTwo', ExampleTwo);
 
 const app = new Vue({
   el: '#app'

@@ -2,8 +2,8 @@
   "name": "@zaichaopan/emoji-picker",
   "version": "0.1.0",
   "private": true,
-  "main": "./dist/emoji-picker.umd.min.js",
-  "style": "dist/emoji-picker.css",
+  "main": "./dist/emoji-picker.common.js",
+  "style": "./dist/emoji-picker.css",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --target lib --name emoji-picker ./src/index.js",

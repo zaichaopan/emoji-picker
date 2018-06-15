@@ -25,7 +25,7 @@
                     <span v-for="(val,key) in categories"
                           :key="key"
                           :title="val"
-                          :class="{active: key === scrolledTo}"
+                          :class="{active: key.toLowerCase() === scrolledTo.toLowerCase()}"
                           class="pointer"
                           @click="scrollToCategory(key)"
                           v-html="val">
@@ -373,12 +373,15 @@ export default {
       border-bottom: 1px solid #dddd;
       width: 100%;
       margin-bottom: 10px;
-      padding: 10px 4px 0 4px;
+      padding: 10px 4px 5px 4px;
       display: flex;
       background: #f8fafc;
       justify-content: space-between;
       border-top-right-radius: 5px;
       border-top-left-radius: 5px;
+      span {
+        position: relative;
+      }
     }
     .search {
       position: relative;
@@ -431,7 +434,6 @@ export default {
       .emoji-list {
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
       }
       .emoji {
         padding: 3px;
@@ -447,7 +449,18 @@ export default {
     }
   }
   .active {
-    border-bottom: 2px solid green;
+    &:before {
+      border-right: 2px solid green;
+      content: "";
+      display: block;
+      height: 28px;
+      font-size: 36px;
+      -webkit-transform: rotate(90deg);
+      transform: rotate(90deg);
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
   }
   .pointer {
     cursor: pointer;
