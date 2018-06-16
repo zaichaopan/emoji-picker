@@ -25,7 +25,7 @@
                     <span v-for="(val,key) in categories"
                           :key="key"
                           :title="val"
-                          :class="{active: key.toLowerCase() === scrolledTo.toLowerCase()}"
+                          :class="{active: key === scrolledTo}"
                           class="pointer"
                           @click="scrollToCategory(key)"
                           v-html="val">
@@ -116,12 +116,16 @@
 </template>
 
 <script>
-import skinTone from 'skin-tone';
 import Popper from 'popper.js';
-import {categories, searchSVG, emojiInvokerOpen, emojiInvokerClose} from '../../data/svg.js';
-import frequentlyUsed from '../../data/frequently-used';
+import skinTone from 'skin-tone';
 import ClickOutside from './ClickOutside.vue';
+import frequentlyUsed from '../../data/frequently-used';
+import {categories, searchSVG, emojiInvokerOpen, emojiInvokerClose} from '../../data/svg.js';
 
+const DEFUALT_SKIN_TON = 'default_skin_ton';
+const FREQUENTLY_USED = 'frequently_used';
+const FREQUENTLY_USED_CATEGORY_NAME = 'Frequently Used';
+const FREQUENTLY_USED_EMOJIS = 'frequently_used_emojis';
 const skinToneNames = [
   { name: 'NONE' },
   { name: 'WHITE' },
@@ -145,28 +149,28 @@ export default {
   data () {
     return {
       show: false,
-      isInvokerHovered: false,
       search: '',
-      emojiInvokerIcon: null,
+      popper: null,
+      skinTonPickers: [],
+      hoveredEmoji: null,
       emojiInvoker: null,
       emojiDropdown: null,
       selectedEmoji: null,
       searchSVG: searchSVG,
-      initEmojis: {},
+      categorizedEmojis: {},
+      categories: categories,
+      emojiInvokerIcon: null,
+      isInvokerHovered: false,
+      showSkinTonPickers: false,
       emojiInvokerClose: emojiInvokerClose,
       emojiInvokerOpen: emojiInvokerOpen,
-      categories: categories,
-      scrolledTo: 'frequently_used',
-      skinTonPickers: [],
-      showSkinTonPickers: false,
-      hoveredEmoji: null,
-      popper: null
+      scrolledTo: FREQUENTLY_USED
     };
   },
   watch: {
     search () {
       if (this.search !== '') {
-        this.scrolledTo = 'frequently_used';
+        this.scrolledTo = FREQUENTLY_USED;
       }
     },
     show () {
@@ -181,7 +185,7 @@ export default {
   },
   computed: {
     emojis () {
-      return this.search ? this.filteredEmojis() : this.initEmojis;
+      return this.search ? this.filteredEmojis() : this.categorizedEmojis;
     }
   },
   methods: {
@@ -191,31 +195,24 @@ export default {
     close () {
       this.show = false;
     },
-
     toggleDropdown () {
-      if (this.show) {
-        this.close();
-      } else {
-        this.open();
-      }
+      this.show ? this.close() : this.open();
     },
     setFrequentUsedEmoji (emojiObj) {
-      let key = 'Frequently Used';
       const maxLength = 9;
       let frequentUsedEmojis = this.getFrequentUsedEmojis().filter(item => item.description !== emojiObj.description);
-      emojiObj.category = key;
+      emojiObj.category = FREQUENTLY_USED_CATEGORY_NAME;
       frequentUsedEmojis = [...frequentUsedEmojis, emojiObj];
 
       if (frequentUsedEmojis.length > maxLength) {
         frequentUsedEmojis.shift();
       }
 
-      localStorage.setItem('frequently_used_emojis', JSON.stringify(frequentUsedEmojis));
-
-      this.initEmojis[key] = frequentUsedEmojis;
+      localStorage.setItem(FREQUENTLY_USED_EMOJIS, JSON.stringify(frequentUsedEmojis));
+      this.categorizedEmojis[FREQUENTLY_USED_CATEGORY_NAME] = frequentUsedEmojis;
     },
     getFrequentUsedEmojis () {
-      let frequentUsedEmojis = localStorage.getItem('frequently_used_emojis');
+      let frequentUsedEmojis = localStorage.getItem(FREQUENTLY_USED_EMOJIS);
 
       if (frequentUsedEmojis === null) {
         frequentUsedEmojis = frequentlyUsed;
@@ -229,7 +226,7 @@ export default {
     selectEmoji (emojiObj) {
       this.$emit('emoji:picked', emojiObj.emoji);
       this.setFrequentUsedEmoji(emojiObj);
-      this.show = false;
+      this.close();
     },
     scrollToCategory (category) {
       let [element] = this.$refs[category];
@@ -238,26 +235,29 @@ export default {
     handleScroll () {
       let emojis = this.$refs.emojis;
       emojis.addEventListener('scroll', e => {
-        if (!this.search) {
-          Object.keys(this.categories).forEach(category => {
-            let [element] = this.$refs[this.getCategoryRef(category)];
-            if (element && emojis.scrollTop >= element.offsetTop) {
-              this.scrolledTo = category;
-            }
-          });
+        if (this.search) {
+          return;
         }
+
+        Object.keys(this.categories).forEach(category => {
+          let [element] = this.$refs[this.getCategoryRef(category)];
+          if (element && emojis.scrollTop >= element.offsetTop) {
+            this.scrolledTo = category;
+          }
+        });
       });
     },
     filteredEmojis () {
       let filteredEmojis = {};
-      for (let category in this.initEmojis) {
-        this.initEmojis[category].forEach(emoji => {
-          if (~emoji.description.toLowerCase().indexOf(this.search.toLowerCase())) {
-            if (!filteredEmojis.hasOwnProperty(category)) {
-              filteredEmojis[category] = [];
-            }
-            filteredEmojis[category] = [ ...filteredEmojis[category], emoji ];
+      for (let category in this.categorizedEmojis) {
+        this.categorizedEmojis[category].forEach(emoji => {
+          if (!~emoji.description.toLowerCase().indexOf(this.search.toLowerCase())) {
+            return;
           }
+          if (!filteredEmojis.hasOwnProperty(category)) {
+            filteredEmojis[category] = [];
+          }
+          filteredEmojis[category] = [ ...filteredEmojis[category], emoji ];
         });
       }
 
@@ -282,19 +282,19 @@ export default {
       return categorizedEmojis;
     },
     getDefaultSkinTon () {
-      let defaultSkinTon = localStorage.getItem('default_skin_ton');
+      let defaultSkinTon = localStorage.getItem(DEFUALT_SKIN_TON);
       return defaultSkinTon === null
         ? {name: 'NONE', emoji: '✋'}
         : JSON.parse(defaultSkinTon);
     },
     setDefaultSkinTon (skinTon) {
       this.showSkinTonPickers = !this.showSkinTonPickers;
-      localStorage.setItem('default_skin_ton', JSON.stringify(skinTon));
+      localStorage.setItem(DEFUALT_SKIN_TON, JSON.stringify(skinTon));
       this.resetInitEmojis(skinTon.name);
     },
     resetInitEmojis (tone) {
-      for (let categroy in this.initEmojis) {
-        this.initEmojis[categroy].forEach(emojiObj => {
+      for (let categroy in this.categorizedEmojis) {
+        this.categorizedEmojis[categroy].forEach(emojiObj => {
           emojiObj.emoji = skinTone(emojiObj.emoji, skinTone[tone]);
         });
       }
@@ -327,17 +327,15 @@ export default {
     },
     setupPopper () {
       if (this.popper === null) {
-        this.popper = new Popper(this.emojiInvoker, this.emojiDropdown, {
-          placement: 'bottom-end'
-        });
-      } else {
-        this.popper.scheduleUpdate();
+        this.popper = new Popper(this.emojiInvoker, this.emojiDropdown, { placement: 'bottom-end' });
+        return;
       }
+      this.popper.scheduleUpdate();
     }
   },
   mounted () {
     this.skinTonPickers = this.getToneHands();
-    this.initEmojis = this.categorizeEmojis();
+    this.categorizedEmojis = this.categorizeEmojis();
     this.emojiDropdown = this.$refs.emojiDropdown;
     this.emojiInvoker = this.$refs.emojiInvoker;
     this.emojiInvokerIcon = this.$refs.emojiInvokerIcon;
