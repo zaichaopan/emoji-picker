@@ -1,7 +1,6 @@
 {
   "name": "@zaichaopan/emoji-picker",
   "version": "0.1.0",
-  "private": true,
   "main": "./dist/emoji-picker.common.js",
   "style": "./dist/emoji-picker.css",
   "scripts": {
@@ -9,6 +8,13 @@
     "build": "vue-cli-service build --target lib --name emoji-picker ./src/index.js",
     "lint": "vue-cli-service lint"
   },
+  "keywords": [
+    "javascript",
+    "vue",
+    "emoji"
+  ],
+  "author": "Zai Chao Pan <zaichaopan@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "popper.js": "^1.14.3",
     "skin-tone": "^1.0.0",
