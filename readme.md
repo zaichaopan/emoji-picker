@@ -4,7 +4,7 @@ An elegant emoji picker built with Vue.
 
 ![emoji-picker](https://github.com/zaichaopan/emoji-picker/blob/master/emoji-picker.png?raw=true "emoji picker image")
 
-Play it on [code sandbox]()
+Play it on [code sandbox](https://codesandbox.io/s/pwz16z05mj)
 
 ## Installation
 
@@ -51,35 +51,6 @@ export default {
 </script>
 ```
 
-* Add styling
-
-```html
-<!-- MyComponent.vue -->
-<template>
-    <div>
-        <emoji-picker :data="data" />
-    </div>
-</template>
-
-<script>
-import data from '@zaichaopan/emoji-picker/data/emojis.json';
-
-export default {
-   data () {
-    return {
-      data: data
-    };
-  },
-  // ...
-}
-</script>
-
-<style lang="scss">
-@import "@zaichaopan/emoji-picker/dist/emoji-picker.css";
-
-</style>
-```
-
 * Listen for emoji picked event
 
 When a emoji gets picked, the component will emit event __emoji:picked__. You can listen to it and get the picked emoji to update your form
@@ -108,10 +79,6 @@ export default {
   }
 };
 </script>
-
-<style lang="scss">
-@import "~@zaichaopan/emoji-picker/dist/emoji-picker.css";
-</style>
 ```
 
-__That is all you need to do to add emoji picker to your application__. A complete example can be found in [code sandbox]().
+__That is all you need to do to add emoji picker to your application__. A complete example can be found in [code sandbox](https://codesandbox.io/s/pwz16z05mj).
