@@ -89,7 +89,6 @@ When a emoji gets picked, the component will emit event __emoji:picked__. You ca
     <div>
         <emoji-picker @emoji:picked="handleEmojiPicked"
                       :data="data" />
-        </div>
    </div>
 </template>
 
@@ -111,7 +110,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@zaichaopan/emoji-picker/dist/emoji-picker.css";
+@import "~@zaichaopan/emoji-picker/dist/emoji-picker.css";
 </style>
 ```
 
