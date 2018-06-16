@@ -457,7 +457,7 @@ export default {
       transform: rotate(90deg);
       position: absolute;
       right: 10px;
-      top: 10px;
+      top: 15px;
     }
   }
   .pointer {
