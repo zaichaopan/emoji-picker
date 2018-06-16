@@ -1,6 +1,6 @@
 {
   "name": "@zaichaopan/emoji-picker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "./dist/emoji-picker.common.js",
   "style": "./dist/emoji-picker.css",
   "scripts": {
