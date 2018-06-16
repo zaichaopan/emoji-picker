@@ -4,7 +4,7 @@ An elegant emoji picker built with Vue.
 
 ![emoji-picker](https://github.com/zaichaopan/emoji-picker/blob/master/emoji-picker.png?raw=true "emoji picker image")
 
-Play it on [code sandbox](https://codesandbox.io/s/pwz16z05mj)
+Play it on [code sandbox](https://codesandbox.io/s/zw4olply3l)
 
 ## Installation
 
@@ -81,4 +81,4 @@ export default {
 </script>
 ```
 
-__That is all you need to do to add emoji picker to your application__. A complete example can be found in [code sandbox](https://codesandbox.io/s/pwz16z05mj).
+__That is all you need to do to add emoji picker to your application__. A complete example can be found in [code sandbox](https://codesandbox.io/s/zw4olply3l).
